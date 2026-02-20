@@ -36,7 +36,7 @@ func main() {
 	api := router.Group("/api")
 	authRoutes := api.Group("/auth")
 	{
-		authRoutes.POST("/login", controller.Login)
+		authRoutes.POST("/login/", controller.Login)
 	}
 
 	protectedRoutes := api
