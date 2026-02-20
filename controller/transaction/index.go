@@ -24,7 +24,7 @@ type ValidateTransactionInput struct {
 func Index(c *gin.Context) {
 	var transactions []model.Transaction
 
-	result := model.DB.Order("timestamp desc").Preload("DetailTransaction.Product").Limit(10).Find(&transactions)
+	result := model.DB.Order("timestamp desc").Preload("DetailTransaction.Product").Limit(50).Find(&transactions)
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, res.GeneralResponse{
