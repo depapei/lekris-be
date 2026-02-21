@@ -12,6 +12,7 @@ type User struct {
 	Username string `gorm:"column:username;not null" json:"username"`
 	Password string `gorm:"column:password;not null" json:"password"`
 	Status   int32  `gorm:"column:status;not null" json:"status"`
+	Fullname string `gorm:"column:fullname;not null" json:"fullname"`
 }
 
 // TableName User's table name

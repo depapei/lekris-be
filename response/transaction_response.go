@@ -1,6 +1,8 @@
 package response
 
-import "time"
+import (
+	"time"
+)
 
 type ItemResponse struct {
 	ID          int32   `json:"id"`
@@ -17,6 +19,7 @@ type TransactionResponse struct {
 	Timestamp           time.Time      `json:"timestamp"`
 	Totalprice          int64          `json:"totalprice"`
 	Isreturningcustomer *bool          `json:"isReturningCustomer"`
+	Cashier             string         `json:"cashier"`
 	Items               []ItemResponse `json:"items"`
 }
 

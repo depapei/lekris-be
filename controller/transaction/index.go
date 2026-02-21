@@ -38,7 +38,7 @@ type ValidateTransactionUpdate struct {
 func Index(c *gin.Context) {
 	var transactions []model.Transaction
 
-	result := model.DB.Where("isdelete = ?", time.Time{}).Order("timestamp desc").Preload("DetailTransaction.Product").Limit(50).Find(&transactions)
+	result := model.DB.Where("isdelete = ?", time.Time{}).Order("timestamp desc").Preload("DetailTransaction.Product").Preload("CreatedByUser").Limit(50).Find(&transactions)
 
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, res.GeneralResponse{

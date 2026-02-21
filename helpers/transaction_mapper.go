@@ -24,6 +24,7 @@ func MapTransactionToResponse(trx model.Transaction) response.TransactionRespons
 		Totalprice:          trx.Totalprice,
 		Isreturningcustomer: trx.Isreturningcustomer,
 		Customername:        trx.Customername,
+		Cashier:             trx.CreatedByUser.Fullname,
 		Items:               items,
 	}
 }
