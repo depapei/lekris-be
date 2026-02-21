@@ -20,7 +20,7 @@ func Update(c *gin.Context) {
 	}
 
 	var trx model.Transaction
-	if err := model.DB.First(&trx, id).Error; err != nil {
+	if err := model.DB.Where("isdelete = ?", time.Time{}).First(&trx, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, res.GeneralResponse{Success: false, Message: "Transaction not found"})
 		return
 	}

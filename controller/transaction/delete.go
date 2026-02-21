@@ -3,6 +3,7 @@ package transaction
 import (
 	"Lekris-BE/model"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,9 +21,14 @@ func Delete(c *gin.Context) {
 		return
 	}
 
+	updateData := map[string]interface{}{
+		"isdelete": time.Now(),
+	}
+
 	if err := model.DB.
 		Model(&model.Transaction{}).
-		Delete(`"id" = ? `, id).Error; err != nil {
+		Where(`id = ?`, id).
+		Updates(updateData).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"Success": false,
 			"Message": "Failed to delete transaction due to database error.",
