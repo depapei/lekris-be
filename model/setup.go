@@ -37,6 +37,6 @@ func ConnectDatabase() {
 	sqlDB.SetMaxIdleConns(2) // idle connection
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	DB = database.Debug()
-	// DB = database
+	// DB = database.Debug()
+	DB = database
 }
