@@ -23,6 +23,7 @@ func main() {
 
 	router := gin.New()
 
+	router.Static("/uploads", "./uploads")
 	router.Use(Cors())
 	router.Use(gin.Logger())
 
@@ -65,6 +66,7 @@ func main() {
 			transactionRoutes.POST("/", transaction.Create)
 			transactionRoutes.PUT("/:id/", transaction.Update)
 			transactionRoutes.DELETE("/:id/", transaction.Delete)
+			transactionRoutes.GET("/payment-proof/:id/", transaction.GetPaymentProof)
 		}
 	}
 
@@ -112,11 +114,17 @@ func generateModel() {
 		gen.FieldRelate(field.HasMany, "DetailTransaction", detail_transaction, &field.RelateConfig{
 			GORMTag: field.GormTag{"foreignKey": []string{"transaction_id"}},
 		}),
+		gen.FieldRelate(field.HasOne, "CreatedByUser", user, &field.RelateConfig{
+			GORMTag: field.GormTag{"foreignKey": []string{"createdby"}},
+		}),
+		gen.FieldRelate(field.HasOne, "UpdatedByUser", user, &field.RelateConfig{
+			GORMTag: field.GormTag{"foreignKey": []string{"updatedby"}},
+		}),
 		gen.FieldType("isreturningcustomer", "*bool"),
 	)
 	g.ApplyBasic(user, supply, products, detail_transaction, transaction)
 
-	g.GenerateAllTable()
+	// g.GenerateAllTable()
 
 	// Execute the generation
 	g.Execute()

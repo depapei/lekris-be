@@ -23,6 +23,7 @@ func MapTransactionToResponse(trx model.Transaction) response.TransactionRespons
 		Timestamp:           trx.Timestamp,
 		Totalprice:          trx.Totalprice,
 		Isreturningcustomer: trx.Isreturningcustomer,
+		Customername:        trx.Customername,
 		Items:               items,
 	}
 }

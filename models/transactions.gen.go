@@ -38,6 +38,7 @@ func newTransaction(db *gorm.DB, opts ...gen.DOOption) transaction {
 	_transaction.Createdby = field.NewInt32(tableName, "createdby")
 	_transaction.Updatedby = field.NewInt32(tableName, "updatedby")
 	_transaction.Updatedat = field.NewTime(tableName, "updatedat")
+	_transaction.Customername = field.NewString(tableName, "customername")
 	_transaction.DetailTransaction = transactionHasManyDetailTransaction{
 		db: db.Session(&gorm.Session{}),
 
@@ -47,6 +48,18 @@ func newTransaction(db *gorm.DB, opts ...gen.DOOption) transaction {
 		}{
 			RelationField: field.NewRelation("DetailTransaction.Product", "model.Product"),
 		},
+	}
+
+	_transaction.CreatedByUser = transactionHasOneCreatedByUser{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("CreatedByUser", "model.User"),
+	}
+
+	_transaction.UpdatedByUser = transactionHasOneUpdatedByUser{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("UpdatedByUser", "model.User"),
 	}
 
 	_transaction.fillFieldMap()
@@ -68,7 +81,12 @@ type transaction struct {
 	Createdby           field.Int32
 	Updatedby           field.Int32
 	Updatedat           field.Time
+	Customername        field.String
 	DetailTransaction   transactionHasManyDetailTransaction
+
+	CreatedByUser transactionHasOneCreatedByUser
+
+	UpdatedByUser transactionHasOneUpdatedByUser
 
 	fieldMap map[string]field.Expr
 }
@@ -95,6 +113,7 @@ func (t *transaction) updateTableName(table string) *transaction {
 	t.Createdby = field.NewInt32(table, "createdby")
 	t.Updatedby = field.NewInt32(table, "updatedby")
 	t.Updatedat = field.NewTime(table, "updatedat")
+	t.Customername = field.NewString(table, "customername")
 
 	t.fillFieldMap()
 
@@ -111,7 +130,7 @@ func (t *transaction) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *transaction) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 11)
+	t.fieldMap = make(map[string]field.Expr, 14)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["branchname"] = t.Branchname
 	t.fieldMap["timestamp"] = t.Timestamp
@@ -122,6 +141,7 @@ func (t *transaction) fillFieldMap() {
 	t.fieldMap["createdby"] = t.Createdby
 	t.fieldMap["updatedby"] = t.Updatedby
 	t.fieldMap["updatedat"] = t.Updatedat
+	t.fieldMap["customername"] = t.Customername
 
 }
 
@@ -129,12 +149,18 @@ func (t transaction) clone(db *gorm.DB) transaction {
 	t.transactionDo.ReplaceConnPool(db.Statement.ConnPool)
 	t.DetailTransaction.db = db.Session(&gorm.Session{Initialized: true})
 	t.DetailTransaction.db.Statement.ConnPool = db.Statement.ConnPool
+	t.CreatedByUser.db = db.Session(&gorm.Session{Initialized: true})
+	t.CreatedByUser.db.Statement.ConnPool = db.Statement.ConnPool
+	t.UpdatedByUser.db = db.Session(&gorm.Session{Initialized: true})
+	t.UpdatedByUser.db.Statement.ConnPool = db.Statement.ConnPool
 	return t
 }
 
 func (t transaction) replaceDB(db *gorm.DB) transaction {
 	t.transactionDo.ReplaceDB(db)
 	t.DetailTransaction.db = db.Session(&gorm.Session{})
+	t.CreatedByUser.db = db.Session(&gorm.Session{})
+	t.UpdatedByUser.db = db.Session(&gorm.Session{})
 	return t
 }
 
@@ -219,6 +245,168 @@ func (a transactionHasManyDetailTransactionTx) Count() int64 {
 }
 
 func (a transactionHasManyDetailTransactionTx) Unscoped() *transactionHasManyDetailTransactionTx {
+	a.tx = a.tx.Unscoped()
+	return &a
+}
+
+type transactionHasOneCreatedByUser struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a transactionHasOneCreatedByUser) Where(conds ...field.Expr) *transactionHasOneCreatedByUser {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a transactionHasOneCreatedByUser) WithContext(ctx context.Context) *transactionHasOneCreatedByUser {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a transactionHasOneCreatedByUser) Session(session *gorm.Session) *transactionHasOneCreatedByUser {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a transactionHasOneCreatedByUser) Model(m *model.Transaction) *transactionHasOneCreatedByUserTx {
+	return &transactionHasOneCreatedByUserTx{a.db.Model(m).Association(a.Name())}
+}
+
+func (a transactionHasOneCreatedByUser) Unscoped() *transactionHasOneCreatedByUser {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
+type transactionHasOneCreatedByUserTx struct{ tx *gorm.Association }
+
+func (a transactionHasOneCreatedByUserTx) Find() (result *model.User, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a transactionHasOneCreatedByUserTx) Append(values ...*model.User) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a transactionHasOneCreatedByUserTx) Replace(values ...*model.User) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a transactionHasOneCreatedByUserTx) Delete(values ...*model.User) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a transactionHasOneCreatedByUserTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a transactionHasOneCreatedByUserTx) Count() int64 {
+	return a.tx.Count()
+}
+
+func (a transactionHasOneCreatedByUserTx) Unscoped() *transactionHasOneCreatedByUserTx {
+	a.tx = a.tx.Unscoped()
+	return &a
+}
+
+type transactionHasOneUpdatedByUser struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a transactionHasOneUpdatedByUser) Where(conds ...field.Expr) *transactionHasOneUpdatedByUser {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a transactionHasOneUpdatedByUser) WithContext(ctx context.Context) *transactionHasOneUpdatedByUser {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a transactionHasOneUpdatedByUser) Session(session *gorm.Session) *transactionHasOneUpdatedByUser {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a transactionHasOneUpdatedByUser) Model(m *model.Transaction) *transactionHasOneUpdatedByUserTx {
+	return &transactionHasOneUpdatedByUserTx{a.db.Model(m).Association(a.Name())}
+}
+
+func (a transactionHasOneUpdatedByUser) Unscoped() *transactionHasOneUpdatedByUser {
+	a.db = a.db.Unscoped()
+	return &a
+}
+
+type transactionHasOneUpdatedByUserTx struct{ tx *gorm.Association }
+
+func (a transactionHasOneUpdatedByUserTx) Find() (result *model.User, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a transactionHasOneUpdatedByUserTx) Append(values ...*model.User) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a transactionHasOneUpdatedByUserTx) Replace(values ...*model.User) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a transactionHasOneUpdatedByUserTx) Delete(values ...*model.User) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a transactionHasOneUpdatedByUserTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a transactionHasOneUpdatedByUserTx) Count() int64 {
+	return a.tx.Count()
+}
+
+func (a transactionHasOneUpdatedByUserTx) Unscoped() *transactionHasOneUpdatedByUserTx {
 	a.tx = a.tx.Unscoped()
 	return &a
 }

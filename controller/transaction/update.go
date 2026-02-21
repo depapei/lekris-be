@@ -5,13 +5,14 @@ import (
 	"Lekris-BE/model"
 	res "Lekris-BE/response"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Update(c *gin.Context) {
 	id := c.Param("id")
-	var input ValidateTransactionInput
+	var input ValidateTransactionUpdate
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Success": false, "Message": err.Error()})
@@ -35,6 +36,9 @@ func Update(c *gin.Context) {
 		"Branchname":          input.Branchname,
 		"Totalprice":          input.Totalprice,
 		"Isreturningcustomer": input.Isreturningcustomer,
+		"Customername":        input.Customername,
+		"Updatedby":           input.UpdatedBy,
+		"Updatedat":           time.Now(),
 	}).Error; err != nil {
 		dbTx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"Success": false, "Message": "Failed to update header", "Error": err.Error()})

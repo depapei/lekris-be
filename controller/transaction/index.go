@@ -16,8 +16,21 @@ type TransactionItemInput struct {
 
 type ValidateTransactionInput struct {
 	Branchname          string                 `json:"branchName" binding:"required" example:"Pasar Segar"`
+	Customername        string                 `json:"customerName" binding:"omitempty" example:"Rangga"`
 	Totalprice          int64                  `json:"totalPrice" binding:"required" example:"16000"`
-	Isreturningcustomer *bool                  `json:"Isreturningcustomer" binding:"required"`
+	Isreturningcustomer *bool                  `json:"isReturningCustomer" binding:"required"`
+	CreatedBy           int64                  `json:"createdBy" binding:"required"`
+	PaymentProof        string                 `json:"payment_proof" binding:"omitempty"`
+	Items               []TransactionItemInput `json:"items" binding:"required,dive"`
+}
+
+type ValidateTransactionUpdate struct {
+	Branchname          string                 `json:"branchName" binding:"required" example:"Pasar Segar"`
+	Customername        string                 `json:"customerName" binding:"omitempty" example:"Rangga"`
+	Totalprice          int64                  `json:"totalPrice" binding:"required" example:"16000"`
+	Isreturningcustomer *bool                  `json:"isReturningCustomer" binding:"required"`
+	UpdatedBy           int64                  `json:"updatedBy" binding:"required"`
+	PaymentProof        string                 `json:"payment_proof" binding:"omitempty"`
 	Items               []TransactionItemInput `json:"items" binding:"required,dive"`
 }
 

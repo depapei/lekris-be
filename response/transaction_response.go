@@ -12,10 +12,11 @@ type ItemResponse struct {
 
 type TransactionResponse struct {
 	ID                  int32          `json:"id"`
-	Branchname          string         `json:"branchname"`
+	Branchname          string         `json:"branchName"`
+	Customername        string         `json:"customerName"`
 	Timestamp           time.Time      `json:"timestamp"`
 	Totalprice          int64          `json:"totalprice"`
-	Isreturningcustomer *bool          `json:"isreturningcustomer"`
+	Isreturningcustomer *bool          `json:"isReturningCustomer"`
 	Items               []ItemResponse `json:"items"`
 }
 
