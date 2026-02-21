@@ -12,7 +12,6 @@ type DetailTransaction struct {
 	ProductID     int32   `gorm:"column:product_id;not null" json:"product_id"`
 	Quantity      float64 `gorm:"column:quantity;not null" json:"quantity"`
 	TransactionID int32   `gorm:"column:transaction_id;not null" json:"transaction_id"`
-	Product       Product `gorm:"foreignKey:product_id" json:"product"`
 }
 
 // TableName DetailTransaction's table name

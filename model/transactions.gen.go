@@ -12,12 +12,16 @@ const TableNameTransaction = "transactions"
 
 // Transaction mapped from table <transactions>
 type Transaction struct {
-	ID                  int32               `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	Branchname          string              `gorm:"column:branchname" json:"branchname"`
-	Timestamp           time.Time           `gorm:"column:timestamp;default:now()" json:"timestamp"`
-	Totalprice          int64               `gorm:"column:totalprice" json:"totalprice"`
-	Isreturningcustomer *bool               `gorm:"column:isreturningcustomer" json:"isreturningcustomer"`
-	DetailTransaction   []DetailTransaction `gorm:"foreignKey:transaction_id" json:"detail_transaction"`
+	ID                  int32     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
+	Branchname          string    `gorm:"column:branchname" json:"branchname"`
+	Timestamp           time.Time `gorm:"column:timestamp;default:now()" json:"timestamp"`
+	Totalprice          int64     `gorm:"column:totalprice" json:"totalprice"`
+	Isreturningcustomer bool      `gorm:"column:isreturningcustomer" json:"isreturningcustomer"`
+	Isdelete            time.Time `gorm:"column:isdelete" json:"isdelete"`
+	Imagepath           string    `gorm:"column:imagepath;not null" json:"imagepath"`
+	Createdby           int32     `gorm:"column:createdby;not null" json:"createdby"`
+	Updatedby           int32     `gorm:"column:updatedby" json:"updatedby"`
+	Updatedat           time.Time `gorm:"column:updatedat" json:"updatedat"`
 }
 
 // TableName Transaction's table name

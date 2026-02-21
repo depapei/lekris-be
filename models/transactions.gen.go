@@ -33,6 +33,11 @@ func newTransaction(db *gorm.DB, opts ...gen.DOOption) transaction {
 	_transaction.Timestamp = field.NewTime(tableName, "timestamp")
 	_transaction.Totalprice = field.NewInt64(tableName, "totalprice")
 	_transaction.Isreturningcustomer = field.NewBool(tableName, "isreturningcustomer")
+	_transaction.Isdelete = field.NewTime(tableName, "isdelete")
+	_transaction.Imagepath = field.NewString(tableName, "imagepath")
+	_transaction.Createdby = field.NewInt32(tableName, "createdby")
+	_transaction.Updatedby = field.NewInt32(tableName, "updatedby")
+	_transaction.Updatedat = field.NewTime(tableName, "updatedat")
 	_transaction.DetailTransaction = transactionHasManyDetailTransaction{
 		db: db.Session(&gorm.Session{}),
 
@@ -58,6 +63,11 @@ type transaction struct {
 	Timestamp           field.Time
 	Totalprice          field.Int64
 	Isreturningcustomer field.Bool
+	Isdelete            field.Time
+	Imagepath           field.String
+	Createdby           field.Int32
+	Updatedby           field.Int32
+	Updatedat           field.Time
 	DetailTransaction   transactionHasManyDetailTransaction
 
 	fieldMap map[string]field.Expr
@@ -80,6 +90,11 @@ func (t *transaction) updateTableName(table string) *transaction {
 	t.Timestamp = field.NewTime(table, "timestamp")
 	t.Totalprice = field.NewInt64(table, "totalprice")
 	t.Isreturningcustomer = field.NewBool(table, "isreturningcustomer")
+	t.Isdelete = field.NewTime(table, "isdelete")
+	t.Imagepath = field.NewString(table, "imagepath")
+	t.Createdby = field.NewInt32(table, "createdby")
+	t.Updatedby = field.NewInt32(table, "updatedby")
+	t.Updatedat = field.NewTime(table, "updatedat")
 
 	t.fillFieldMap()
 
@@ -96,12 +111,17 @@ func (t *transaction) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (t *transaction) fillFieldMap() {
-	t.fieldMap = make(map[string]field.Expr, 6)
+	t.fieldMap = make(map[string]field.Expr, 11)
 	t.fieldMap["id"] = t.ID
 	t.fieldMap["branchname"] = t.Branchname
 	t.fieldMap["timestamp"] = t.Timestamp
 	t.fieldMap["totalprice"] = t.Totalprice
 	t.fieldMap["isreturningcustomer"] = t.Isreturningcustomer
+	t.fieldMap["isdelete"] = t.Isdelete
+	t.fieldMap["imagepath"] = t.Imagepath
+	t.fieldMap["createdby"] = t.Createdby
+	t.fieldMap["updatedby"] = t.Updatedby
+	t.fieldMap["updatedat"] = t.Updatedat
 
 }
 
