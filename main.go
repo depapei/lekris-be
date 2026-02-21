@@ -33,7 +33,7 @@ func main() {
 	}
 	model.ConnectDatabase()
 
-	generateModel()
+	// generateModel()
 	api := router.Group("/api")
 	authRoutes := api.Group("/auth")
 	{
