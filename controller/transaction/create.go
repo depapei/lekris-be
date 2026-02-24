@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,8 +21,9 @@ func Create(c *gin.Context) {
 	}
 
 	// 1. Handle payment_proof upload DULUAN (sebelum DB transaction)
-	uploadDir := filepath.Join("uploads", "transactions")
-	baseURL := "/uploads/transactions"
+	now := time.Now().Format("02-01-2006")
+	uploadDir := filepath.Join("uploads", "transactions", now)
+	baseURL := "/uploads/transactions/" + now
 
 	uploadResult, err := helpers.SaveBase64Image(input.PaymentProof, uploadDir, baseURL)
 	if err != nil {
