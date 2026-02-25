@@ -86,7 +86,13 @@ func Cors() gin.HandlerFunc {
 
 func generateModel() {
 	// Generate Models
-	dsn := "host=localhost user=postgres password=db123 dbname=lele-krispy port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := "host= " + os.Getenv("DB_HOST") +
+		" user=" + os.Getenv("DB_USER") +
+		" password=" + os.Getenv("DB_PASSWORD") +
+		" dbname=" + os.Getenv("DB_DBNAME") +
+		" port=" + os.Getenv("DB_PORT") +
+		" sslmode=disable " +
+		" timezone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
