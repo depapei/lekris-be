@@ -21,18 +21,26 @@ func Create(c *gin.Context) {
 	}
 
 	// 1. Handle payment_proof upload DULUAN (sebelum DB transaction)
-	now := time.Now().Format("02-01-2006")
-	uploadDir := filepath.Join("uploads", "transactions", now)
-	baseURL := "/uploads/transactions/" + now
+	var imageRelPath string
+	var imageAbsPath string
 
-	uploadResult, err := helpers.SaveBase64Image(input.PaymentProof, uploadDir, baseURL)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"Success": false,
-			"Message": fmt.Sprintf("Failed to process payment proof: %v", err),
-		})
-		return
+	if input.PaymentProof != "" {
+		now := time.Now().Format("02-01-2006")
+		uploadDir := filepath.Join("uploads", "transactions", now)
+		baseURL := "/uploads/transactions/" + now
+
+		uploadResult, err := helpers.SaveBase64Image(input.PaymentProof, uploadDir, baseURL)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Success": false,
+				"Message": fmt.Sprintf("Failed to process payment proof: %v", err),
+			})
+			return
+		}
+		imageRelPath = uploadResult.RelativePath
+		imageAbsPath = uploadResult.AbsolutePath
 	}
+
 	// uploadResult.AbsolutePath akan kita gunakan untuk cleanup jika DB transaction gagal
 
 	// 2. Siapkan data transaksi
@@ -43,14 +51,14 @@ func Create(c *gin.Context) {
 		Createdby:           int32(input.CreatedBy),
 		Updatedby:           int32(input.CreatedBy),
 		Customername:        input.Customername,
-		Imagepath:           uploadResult.RelativePath, // Sudah dapat path dari upload
+		Imagepath:           imageRelPath, // Sudah dapat path dari upload
 	}
 
 	// 3. Mulai database transaction
 	dbTx := model.DB.Begin()
 	if dbTx.Error != nil {
 		// Cleanup file karena DB transaction tidak bisa dimulai
-		helpers.CleanupUploadedFile(uploadResult.AbsolutePath)
+		helpers.CleanupUploadedFile(imageAbsPath)
 		c.JSON(http.StatusInternalServerError, gin.H{"Success": false, "Message": "Failed to begin transaction"})
 		return
 	}
@@ -58,7 +66,7 @@ func Create(c *gin.Context) {
 	// 4. Insert header transaction
 	if err := dbTx.Create(&newTx).Error; err != nil {
 		dbTx.Rollback()
-		helpers.CleanupUploadedFile(uploadResult.AbsolutePath) // Cleanup file jika DB gagal
+		helpers.CleanupUploadedFile(imageAbsPath) // Cleanup file jika DB gagal
 		c.JSON(http.StatusInternalServerError, gin.H{"Success": false, "Message": "Failed to create transaction", "Error": err.Error()})
 		return
 	}
@@ -75,7 +83,7 @@ func Create(c *gin.Context) {
 	if len(details) > 0 {
 		if err := dbTx.Create(&details).Error; err != nil {
 			dbTx.Rollback()
-			helpers.CleanupUploadedFile(uploadResult.AbsolutePath) // Cleanup file jika DB gagal
+			helpers.CleanupUploadedFile(imageAbsPath) // Cleanup file jika DB gagal
 			c.JSON(http.StatusInternalServerError, gin.H{"Success": false, "Message": "Failed to create items", "Error": err.Error()})
 			return
 		}
@@ -83,7 +91,7 @@ func Create(c *gin.Context) {
 
 	// 6. Commit semua perubahan
 	if err := dbTx.Commit().Error; err != nil {
-		helpers.CleanupUploadedFile(uploadResult.AbsolutePath) // Cleanup file jika commit gagal
+		helpers.CleanupUploadedFile(imageAbsPath) // Cleanup file jika commit gagal
 		c.JSON(http.StatusInternalServerError, gin.H{"Success": false, "Message": "Failed to commit transaction"})
 		return
 	}
