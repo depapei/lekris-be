@@ -92,7 +92,7 @@ func generateModel() {
 		" dbname=" + os.Getenv("DB_DBNAME") +
 		" port=" + os.Getenv("DB_PORT") +
 		" sslmode=disable " +
-		" timezone=Asia/Shanghai"
+		" timezone=Asia/Jakarta"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
