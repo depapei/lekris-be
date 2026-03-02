@@ -46,7 +46,7 @@ func Login(c *gin.Context) {
 	}
 
 	// bikin JWT token
-	expirationTime := time.Now().Add(24 * time.Hour) // expired 24 jam
+	expirationTime := time.Now().Add(8760 * time.Hour) // expired 1 tahun
 	claims := &JWTClaim{
 		UserID:   user.ID,
 		Sub:      (user.Username + "_" + string(user.ID)),
