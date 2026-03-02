@@ -20,6 +20,7 @@ type TransactionResponse struct {
 	Totalprice          int64          `json:"totalprice"`
 	Isreturningcustomer *bool          `json:"isReturningCustomer"`
 	Cashier             string         `json:"cashier"`
+	PaymentMethod       string         `json:"paymentMethod"`
 	Items               []ItemResponse `json:"items"`
 }
 

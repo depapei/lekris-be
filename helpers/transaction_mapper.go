@@ -17,6 +17,12 @@ func MapTransactionToResponse(trx model.Transaction) response.TransactionRespons
 		})
 	}
 
+	var paymentMethod string
+	if trx.Imagepath != "" {
+		paymentMethod = "QRIS"
+	} else {
+		paymentMethod = "CASH"
+	}
 	return response.TransactionResponse{
 		ID:                  trx.ID,
 		Branchname:          trx.Branchname,
@@ -25,6 +31,7 @@ func MapTransactionToResponse(trx model.Transaction) response.TransactionRespons
 		Isreturningcustomer: trx.Isreturningcustomer,
 		Customername:        trx.Customername,
 		Cashier:             trx.CreatedByUser.Fullname,
+		PaymentMethod:       paymentMethod,
 		Items:               items,
 	}
 }
