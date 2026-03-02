@@ -54,7 +54,7 @@ func Login(c *gin.Context) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			// Issuer:    "yourapp", // opsional
+			Issuer:    "lekris-authentication-system", // opsional
 		},
 	}
 
