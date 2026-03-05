@@ -23,6 +23,7 @@ type ValidateTransactionInput struct {
 	CreatedBy           int64                  `json:"createdBy" binding:"required"`
 	PaymentProof        string                 `json:"payment_proof" binding:"omitempty"`
 	Items               []TransactionItemInput `json:"items" binding:"required,dive"`
+	InputDate           string                 `json:"inputDate" binding:"required"`
 }
 
 type ValidateTransactionUpdate struct {

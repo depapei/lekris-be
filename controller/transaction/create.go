@@ -44,6 +44,15 @@ func Create(c *gin.Context) {
 	// uploadResult.AbsolutePath akan kita gunakan untuk cleanup jika DB transaction gagal
 
 	// 2. Siapkan data transaksi
+	parsedInputDate, err := time.Parse("2006-01-02 15:04:05.999-07:00", input.InputDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"Success": false,
+			"Message": err.Error(),
+		})
+		return
+	}
+
 	newTx := model.Transaction{
 		Branchname:          input.Branchname,
 		Totalprice:          input.Totalprice,
@@ -51,7 +60,8 @@ func Create(c *gin.Context) {
 		Createdby:           int32(input.CreatedBy),
 		Updatedby:           int32(input.CreatedBy),
 		Customername:        input.Customername,
-		Imagepath:           imageRelPath, // Sudah dapat path dari upload
+		Imagepath:           imageRelPath,
+		Timestamp:           parsedInputDate,
 	}
 
 	// 3. Mulai database transaction
