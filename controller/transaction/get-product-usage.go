@@ -17,16 +17,18 @@ type ProductUsageResult struct {
 func ProductUsage(c *gin.Context) {
 	var results []ProductUsageResult
 	date := c.Query("date")
+	branch := c.Query("branch")
 
 	startDate, _ := time.Parse("2006-01-02", date)
 	endDate := startDate.Add(24 * time.Hour)
 
 	result := model.DB.
 		Table("transactions t").
-		Select("p.item, COUNT(*) as total").
+		Select("p.item, SUM(dt.quantity) as total").
 		Joins("JOIN detail_transaction dt ON dt.transaction_id = t.id").
 		Joins("JOIN products p ON p.id = dt.product_id").
 		Where("t.timestamp >= ? AND t.timestamp < ?", startDate, endDate).
+		Where("t.branchname = ?", branch).
 		Group("p.id, p.item").
 		Scan(&results)
 
