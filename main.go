@@ -67,6 +67,7 @@ func main() {
 			transactionRoutes.PUT("/:id/", transaction.Update)
 			transactionRoutes.DELETE("/:id/", transaction.Delete)
 			transactionRoutes.GET("/payment-proof/:id/", transaction.GetPaymentProof)
+			transactionRoutes.GET("/product-usage/", transaction.ProductUsage)
 		}
 	}
 
